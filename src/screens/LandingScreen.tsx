@@ -9,9 +9,13 @@ import {
 
 import * as Location from 'expo-location';
 
+import { useNavigation } from '../utils';
+
 const screenWidth = Dimensions.get('screen').width;
 
-export const LoadingScreen = () => {
+export const LandingScreen = () => {
+
+  const { navigate } = useNavigation();
 
   const [errorMsg, setErrorMsg] = useState('');
   const [address, setAddress] = useState<Location.Address>();
@@ -40,13 +44,22 @@ export const LoadingScreen = () => {
           let currentAddress = `${item.name}, ${item.street}, ${item.poastalCode}, ${item.country}`;
 
           setDisplayAddress(currentAddress);
+
+          if (currentAddress.length > 0) {
+            setTimeout(() => {
+              navigate('homeStack')
+            }, 2000)
+          }
+
           return;
         }
       } else {
 
       }
-    })
-  })
+
+    })();
+
+  },[])
 
   return (
     <View style={styles.container}>
