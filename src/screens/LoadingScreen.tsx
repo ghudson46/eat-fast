@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useReducer, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,9 +7,47 @@ import {
   Image
 } from 'react-native';
 
+import * as Location from 'expo-location';
+
 const screenWidth = Dimensions.get('screen').width;
 
 export const LoadingScreen = () => {
+
+  const [errorMsg, setErrorMsg] = useState('');
+  const [address, setAddress] = useState<Location.Address>();
+
+  const [displayAddress, setDisplayAddress] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestPermissionsAsync();
+
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location is not gramted');
+      }
+
+      let location: any = await Location.getCurrentPositionAsync({});
+
+      const { coords } = location;
+
+      if (coords) {
+        const { latitude, longitude } = coords;
+
+        let addressResponse: any = await Location.reverseGeocodeAsync({ latitude, longitude });
+
+        for (let item of addressResponse) {
+          setAddress(item);
+          let currentAddress = `${item.name}, ${item.street}, ${item.poastalCode}, ${item.country}`;
+
+          setDisplayAddress(currentAddress);
+          return;
+        }
+      } else {
+
+      }
+    })
+  })
+
   return (
     <View style={styles.container}>
       <View style={styles.navigation} />
@@ -20,7 +58,7 @@ export const LoadingScreen = () => {
           <Text>Your Delivery Address</Text>
         </View>
 
-        <Text>Waiting for Current Location</Text>
+        <Text style={styles.addressText}>{displayAddress}</Text>
       </View>
       <View style={styles.footer} />
     </View>
